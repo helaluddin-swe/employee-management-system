@@ -1,13 +1,17 @@
 import express from 'express'
 import dotenv from "dotenv"
 import connectDB from './config/db.js'
-dotenv.config()
+import employeeRouter from './routes/employeeRoutes.js'
 const app=express()
-connectDB()
-
+dotenv.config()
 const PORT=process.env.PORT
 app.use(express.json())
 
+connectDB()
+
+
+
+app.use('/api/employee',employeeRouter)
 app.get('/',(req,res)=>{
   res.send("API is Working....................")
 })
