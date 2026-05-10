@@ -1,0 +1,14 @@
+import express from 'express'
+import dotenv from "dotenv"
+dotenv.config()
+const app=express()
+
+const PORT=process.env.PORT
+app.use(express.json())
+
+app.get('/',(req,res)=>{
+  res.send("API is Working....................")
+})
+app.listen(PORT,()=>{
+  console.log(`server run on port http://localhost:${PORT}`)
+})
