@@ -6,8 +6,11 @@ import attendanceRouter from './routes/attendanceRoutes.js'
 import leaveRouter from './routes/leaveRouter.js'
 import payslipRouter from './routes/paySlipRoutes.js'
 import dashbaordRouter from './routes/dashboardRoutes.js'
-import authRouter from './routes/authRoutes.js'
+import { serve } from "inngest/express";
+import { inngest, functions } from "./inngest/index.js"
+
 import profileRouter from './routes/profileRoutes.js'
+import authRouter from './routes/authRoutes.js'
 const app=express()
 dotenv.config()
 const PORT=process.env.PORT
@@ -23,6 +26,7 @@ app.use('/api/dashboard',dashbaordRouter)
 app.use('/api/auth',authRouter)
 app.use('/api/employees',employeeRouter)
 app.use('/api/profile',profileRouter)
+app.use("/api/inngest", serve({ client: inngest, functions }));
 app.get('/',(req,res)=>{
   res.send("API is Working....................")
 })

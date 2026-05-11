@@ -1,9 +1,10 @@
-import {Router} from "express"
-
+import express from "express"
+const authRouter=express.Router()
 import { changePassword, login, session } from "../controllers/authController.js"
 import { protect } from "../middleware/auth.js"
-const authRouter=Router()
+import { ipRateLimiter } from "../middleware/rateLimiter.js"
+
 authRouter.post('/session',protect, session)
-authRouter.post('/login',protect,login)
-authRouter.get('/change-password',protect,changePassword)
+authRouter.post('/login',ipRateLimiter,login)
+authRouter.put('/change-password',protect,changePassword)
 export default authRouter
