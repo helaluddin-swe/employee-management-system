@@ -12,7 +12,7 @@ const autoCheckOut = inngest.createFunction(
     id: "auto-check-out",
     triggers: [
       {
-        event: "employee/chekout",
+        event: "employee/checkout",
       },
     ],
   },
