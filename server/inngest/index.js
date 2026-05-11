@@ -113,7 +113,7 @@ const attendanceReminderCorn = inngest.createFunction(
     triggers: [
       {
         // time zone :11:30AM=6:00UTC
-        cron: "0 0 6 * * *",
+         cron: "TZ=Asia/Dhaka 30 11 * * *",
       },
     ],
   },
