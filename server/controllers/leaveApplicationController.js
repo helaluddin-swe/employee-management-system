@@ -26,14 +26,15 @@ export const createLeave=async(req,res)=>{
       }
       const today=new Date()
       today.setHours(0,0,0,0)
-      if(new Date(startDate)<=today || new Date(endDate)<=today){
-        return res.status(400).json({error:"Leave Date be in the futures"})
-      }
-      if(new Date(endDate)< new Date(startDate)){
-        return res.status(400).json({error:"End Date cannot be before start Date"})
-      }
-      const leave=await LeaveAttendance.create({
-        employeeId:emplyee._id,
+     if (new Date(startDate) < today || new Date(endDate) < today) {
+      return res.status(400).json({ error: "Leave date must be in the future or today" });
+    }
+
+    if (new Date(endDate) < new Date(startDate)) {
+      return res.status(400).json({ error: "End date cannot be before start date" });
+    }
+      const leave=await LeaveApplication.create({
+        employeeId:employee._id,
         type,
         startDate:new Date(startDate),
         endDate:new Date(endDate),
@@ -46,7 +47,7 @@ export const createLeave=async(req,res)=>{
       data:{LeaveApplicationId:leave._id}
     })
 
-    return res.json({success:true,date:leave})
+    return res.json({success:true,leave})
       
     
   } catch (error) {

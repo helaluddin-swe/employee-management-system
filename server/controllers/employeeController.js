@@ -32,7 +32,8 @@ export const getEmployee = async (req, res) => {
 export const createEmployee = async (req, res) => {
   try {
     const {
-      email,password,
+      email,
+      password,
       firstName,
       lastName,
       employeeStatus,
@@ -46,37 +47,40 @@ export const createEmployee = async (req, res) => {
       department,
     } = req.body;
 
+    // Grab the role from the decoded token session
+    const role = req.session?.role; 
+
     if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({ error: "Missing Required field" });
-    } else {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({
-        email,
-        password: hashedPassword,
-        role: role || "EMPLOYEE",
-      });
-      const employee = await Employee.create({
-        userId: user._id,
-        firstName,
-        lastName,
-
-        employeeStatus,
-        joinDate: new Date(joinDate),
-        isDeleted,
-        position,
-        allowances: Number(allowances) || 0,
-        basiccSalary: Number(basicSalary) || 0,
-        deductions: Number(deductions) || 0,
-        bio: bio || "",
-        department: Department || "Sales",
-      });
-      res.status(201).json({ success: true, employee });
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const user = await User.create({
+      email,
+      password: hashedPassword,
+      role: role || "EMPLOYEE", 
+    });
+
+    const employee = await Employee.create({
+      userId: user._id,
+      firstName,
+      lastName,
+      employeeStatus,
+     joinDate: joinDate ? new Date(joinDate) : new Date(),
+      isDeleted,
+      position,
+      allowances: Number(allowances) || 0,
+      basicSalary: Number(basicSalary) || 0, 
+      deductions: Number(deductions) || 0,
+      bio: bio || "",
+      department: department || "Sales", 
+    });
+
+    res.status(201).json({ success: true, employee });
   } catch (error) {
     if (error.code === 11000) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Email already exists" });
+      return res.status(400).json({ success: false, error: "Email already exists" });
     }
     res.status(500).json({ error: "Failed to create Employee" });
   }
