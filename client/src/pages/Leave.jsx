@@ -1,6 +1,6 @@
 
 
-const Login = () => {
+const Leave = () => {
   return (
     <div>
       
@@ -8,4 +8,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Leave
