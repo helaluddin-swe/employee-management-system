@@ -1,6 +1,7 @@
 import express from 'express'
 import dotenv from "dotenv"
 import connectDB from './config/db.js'
+import cors from "cors"
 import employeeRouter from './routes/employeeRoutes.js'
 import attendanceRouter from './routes/attendanceRoutes.js'
 import leaveRouter from './routes/leaveRouter.js'
@@ -15,6 +16,9 @@ const app=express()
 dotenv.config()
 const PORT=process.env.PORT
 app.use(express.json())
+app.use(cors({
+  origin:["http://localhost:5173"]
+}))
 
 connectDB()
 

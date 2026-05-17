@@ -59,7 +59,7 @@ export const createEmployee = async (req, res) => {
     const user = await User.create({
       email,
       password: hashedPassword,
-      role: role || "EMPLOYEE", 
+      role: "EMPLOYEE", 
     });
 
     const employee = await Employee.create({
@@ -67,7 +67,7 @@ export const createEmployee = async (req, res) => {
       firstName,
       lastName,
       employeeStatus,
-     joinDate: joinDate ? new Date(joinDate) : new Date(),
+      joinDate: joinDate ? new Date(joinDate) : new Date(),
       isDeleted,
       position,
       allowances: Number(allowances) || 0,
