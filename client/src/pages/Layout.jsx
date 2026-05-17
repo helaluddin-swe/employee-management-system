@@ -8,11 +8,11 @@ const Layout = () => {
   if(loading) return <Loading/>
   if(!user) return <Navigate to="/login"/>
   return (
-    <div className="flex  text-gray-900 h-screen ">
-      <p ><Sidebar/></p>
+    <div className="flex text-gray-900 h-screen ">
+      <Sidebar/>
 
       <main className="flex-1 overflow-y-scroll">
-        <div className="pt-20 px-12 max-w-400">
+        <div className="p-6 md:p-10 mx-auto pt-16 sm:pt-8 max-w-400 lg:p-12 ">
           <Outlet />
         </div>
       </main>
