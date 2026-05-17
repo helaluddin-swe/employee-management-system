@@ -26,11 +26,10 @@ const App = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/employee" element={<Employee />} />
           <Route path="/attendance" element={<Attendance />} />
-          <Route path="/dashboard" element={<Leave />} />
-          <Route path="/dashboard" element={<Payslips />} />
-          <Route path="/dashboard" element={<Settings />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/leave" element={<Leave />} />
+          <Route path="/payslips" element={<Payslips />} />
+          <Route path="/settings" element={<Settings />} />
+          
         </Route>
         <Route path="/print/payslips/:id" element={<PrintPayslips />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

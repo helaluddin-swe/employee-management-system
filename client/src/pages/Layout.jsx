@@ -2,13 +2,14 @@
 import { Navigate, Outlet } from "react-router-dom"
 import { useAuth } from "../context/authContext"
 import Loading from "../componenets/Loading"
+import Sidebar from "../componenets/Sidebar"
 const Layout = () => {
   const {user,loading}=useAuth()
   if(loading) return <Loading/>
   if(!user) return <Navigate to="/login"/>
   return (
     <div className="flex  text-gray-900 h-screen ">
-      <p >sidebar</p>
+      <p ><Sidebar/></p>
 
       <main className="flex-1 overflow-y-scroll">
         <div className="pt-20 px-12 max-w-400">

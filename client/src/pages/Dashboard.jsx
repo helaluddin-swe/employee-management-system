@@ -1,9 +1,11 @@
 
 
+
 const Dashboard = () => {
   return (
-    <div>
-      dashboaed
+    <div className="flex flex-row ">
+   
+
     </div>
   )
 }
