@@ -3,7 +3,7 @@
 const PrintPayslips = () => {
   return (
     <div>
-      
+      print
     </div>
   )
 }

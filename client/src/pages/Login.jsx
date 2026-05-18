@@ -7,7 +7,7 @@ import Loading from "../componenets/Loading"
 const Login = () => {
   const {user,loading}=useAuth()
   if(loading) return <Loading/>
-  if(!user) return <Navigate to="/dashboard"/>
+  if(user) return <Navigate to="/dashboard"/>
   const portalOptions = [
     {
       to: "/login/admin",

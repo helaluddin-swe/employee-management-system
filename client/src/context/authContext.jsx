@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import api from "../api/api";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 
 const AuthContext = createContext(null)
@@ -8,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
   const [token, setToken] = useState(localStorage.getItem("token"))
   const [loading, setLoading] = useState(null)
+  const navigate=useNavigate()
   const refreshToken = async () => {
     const storedToken = localStorage.getItem("token")
     if (!storedToken) {
@@ -51,6 +53,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token")
     setToken(null)
     setUser(null)
+    sessionStorage.clear()
+    navigate("/login")
   }
   const contextValue = { login, logout, token, user, refreshToken, loading }
   return (

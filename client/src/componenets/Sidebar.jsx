@@ -1,21 +1,20 @@
-import { BookAIcon, Calendar1Icon, DollarSignIcon, LayoutDashboard, MenuIcon, Settings2, User2, XIcon } from "lucide-react";
+import { BookAIcon, Calendar1Icon, DollarSignIcon, LayoutDashboard, LogOut, MenuIcon, Settings2, User2, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import api from "../api/api";
+import { useAuth } from "../context/authContext";
 
 const Sidebar = () => {
   const [user, setUser] = useState({ firstName: "User", lastName: "" });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const { logout } = useAuth();
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await api.get("/api/profile");
-        
-        // Safe handling of response (whether it's full employee or fallback)
         const userData = res.data;
-        
         setUser({
           firstName: userData.firstName || userData.name || "User",
           lastName: userData.lastName || "",
@@ -26,11 +25,9 @@ const Sidebar = () => {
         setUser({ firstName: "Guest", lastName: "" });
       }
     };
-
     fetchProfile();
   }, []);
 
-  // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
@@ -50,7 +47,7 @@ const Sidebar = () => {
         onClick={() => setIsMobileMenuOpen(true)}
         className="fixed top-4 left-4 z-50 lg:hidden bg-white shadow-lg p-3 rounded-2xl text-slate-700 hover:bg-gray-100 transition-all"
       >
-        <MenuIcon size={24} />
+        <MenuIcon size={34} className="text-gray-900 bg-white  " />
       </button>
 
       {/* Mobile Overlay */}
@@ -62,14 +59,13 @@ const Sidebar = () => {
       )}
 
       {/* Sidebar */}
-      <div
-        className={`fixed top-0 left-0 h-screen w-20 md:w-64 bg-white border-r border-gray-200 
-          overflow-y-auto transition-all duration-300 z-50 flex flex-col
-          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+      <div className={`fixed top-0 left-0 h-screen w-20 md:w-64 bg-white border-r border-gray-200 
+        overflow-y-auto transition-all duration-300 z-50 flex flex-col
+        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         {/* Header */}
         <div className="p-5 border-b border-gray-200 flex items-center gap-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+          <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0">
             <User2 size={24} />
           </div>
           <div className="hidden md:block">
@@ -79,9 +75,12 @@ const Sidebar = () => {
 
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="ml-auto lg:hidden text-gray-400 hover:text-gray-600"
+            className="absolute  -right-3 -top-2 lg:hidden bg-white shadow-lg border border-gray-200 
+             w-9 h-9 flex items-center justify-center rounded-2xl text-gray-600 
+             hover:text-red-600 hover:border-red-200 hover:shadow-xl 
+             active:scale-90 transition-all duration-200 z-50"
           >
-            <XIcon size={24} />
+            <XIcon size={22} strokeWidth={3} />
           </button>
         </div>
 
@@ -93,8 +92,8 @@ const Sidebar = () => {
               to={item.path}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-300
-                ${isActive 
-                  ? "bg-blue-600 text-white shadow-md" 
+                ${isActive
+                  ? "bg-blue-600 text-white shadow-md"
                   : "hover:bg-gray-100 text-gray-700 hover:translate-x-1"}`
               }
             >
@@ -104,13 +103,20 @@ const Sidebar = () => {
           ))}
         </div>
 
-        {/* Footer - User Info */}
-        <div className="p-5 border-t border-gray-200 mt-auto hidden md:block">
-          <div className="text-sm text-gray-600">
-            Welcome,{" "}
-            <span className="font-semibold text-gray-800">
-              {user.fullName || user.firstName}
-            </span>
+        {/* Footer */}
+        <div className="p-5 border-t border-gray-200 mt-auto">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600 hidden lg:block">
+              Welcome, <span className="font-semibold text-gray-800">{user.fullName || user.firstName}</span>
+            </div>
+
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-4 py-2.5 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all"
+            >
+              <LogOut size={20} />
+              <span className="hidden md:block font-medium text-sm">Logout</span>
+            </button>
           </div>
         </div>
       </div>

@@ -6,16 +6,24 @@ import Sidebar from "../componenets/Sidebar"
 const Layout = () => {
   const {user,loading}=useAuth()
   if(loading) return <Loading/>
-  if(!user) return <Navigate to="/login"/>
+  if(user==null) return <Navigate to="/login"/>
   return (
-    <div className="flex text-gray-900 h-screen ">
-      <Sidebar/>
+  <div className="flex min-h-screen bg-gray-50">
+      <Sidebar />
 
-      <main className="flex-1 overflow-y-scroll">
-        <div className="p-6 md:p-10 mx-auto pt-16 sm:pt-8 max-w-400 lg:p-12 ">
-          <Outlet />
-        </div>
-      </main>
+      {/* Main Content */}
+      <div className="flex-1 lg:ml-64 ml-0 transition-all duration-300">
+        {/* Top Navbar (Optional) */}
+        <nav className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-40">
+          {/* Your top bar content */}
+        </nav>
+
+        {/* Page Content */}
+        <main className="p-6">
+          {/* Your page content goes here */}
+          <Outlet />   {/* if using React Router v6 */}
+        </main>
+      </div>
     </div>
   )
 }

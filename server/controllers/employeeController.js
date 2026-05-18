@@ -5,25 +5,53 @@ import Employee from "../models/employeeModel.js";
 import User from "../models/userModel.js";
 
 // GET /api/getEmployee
+// export const getEmployee = async (req, res) => {
+//   try {
+//     const { department } = req.query;
+//     const filter = {};
+//     if (department) filter.department = department;
+//     const employees = (await Employee.find(filter))
+//       .toSorted({ createdAt: -1 })
+//       .populate("userId", "email role")
+//       .lean();
+//     const result = await employees.map((emp) => ({
+//       ...emp,
+//       id: emp._id.toString(),
+//       userId: emp.userId
+//         ? { email: emp.userId.email, role: emp.userId.role }
+//         : null,
+//     }));
+//     res.status(200).json(result);
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
 export const getEmployee = async (req, res) => {
   try {
     const { department } = req.query;
     const filter = {};
     if (department) filter.department = department;
-    const employees = (await Employee.find(filter))
-      .toSorted({ createdAt: -1 })
+
+    // FIX: Use Mongoose .sort() and chain queries properly before awaiting
+    const employees = await Employee.find(filter)
+      .sort({ createdAt: -1 })
       .populate("userId", "email role")
       .lean();
-    const result = await employees.map((emp) => ({
+
+    // FIX: Removed redundant 'await' from the synchronous .map()
+    const result = employees.map((emp) => ({
       ...emp,
       id: emp._id.toString(),
       userId: emp.userId
         ? { email: emp.userId.email, role: emp.userId.role }
         : null,
     }));
+
     res.status(200).json(result);
   } catch (error) {
-    console.log(error);
+    console.error(error); // Changed to console.error for better logging visibility
     res.status(500).json({ success: false, message: error.message });
   }
 };
