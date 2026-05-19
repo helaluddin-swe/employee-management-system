@@ -1,4 +1,4 @@
-import { BookAIcon, Calendar1Icon, DollarSignIcon, LayoutDashboard, LogOut, MenuIcon, Settings2, User2, XIcon } from "lucide-react";
+import { BookAIcon, Calendar1Icon, DollarSignIcon, LayoutDashboard, LogOut, MenuIcon, Settings2, User2, User2Icon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import api from "../api/api";
@@ -34,6 +34,7 @@ const Sidebar = () => {
 
   const sidebarContent = [
     { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+    { name: "Employee", path: "/employee", icon: User2Icon },
     { name: "Attendance", path: "/attendance", icon: Calendar1Icon },
     { name: "Leave", path: "/leave", icon: BookAIcon },
     { name: "Payslips", path: "/payslips", icon: DollarSignIcon },
