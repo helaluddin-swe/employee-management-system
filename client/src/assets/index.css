@@ -1,17 +1,29 @@
 @import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
 
-* {
-    font-family: "Outfit", "Inter";
+/* 1. Base Styles Layer (Universal resets & element selectors) */
+@layer base {
+    * {
+        font-family: "Outfit", "Inter", sans-serif;
+    }
+
+    input,
+    select,
+    textarea {
+        @apply w-full px-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-md
+            focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400
+            transition-all duration-200 text-sm placeholder:text-slate-400;
+    }
 }
 
+/* 2. Utilities Layer (Custom global components & classes) */
 @layer utilities {
     /* Card styles */
     .card {
         @apply bg-white rounded-lg border border-slate-200/70;
     }
     .card-hover {
-        @apply hover:-translate-y-0.5 transition-all duration-300;
+        @apply transform transition-all duration-300 hover:-translate-y-0.5;
     }
 
     /* Button styles */
@@ -25,32 +37,17 @@
             hover:bg-slate-50 hover:border-slate-300 transition-all duration-200;
     }
 
-    /* Input, Select, Textarea styles */
-    input,
-    select,
-    textarea {
-        @apply w-full px-4 py-2.5 bg-slate-50/50 border border-slate-200 rounded-md
-            focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400
-            transition-all duration-200 text-sm placeholder:text-slate-400;
-    }
-
-    /* Table styles */
+    /* Table styles (Separated to prevent nesting issues) */
     .table-modern {
         @apply w-full text-left text-sm;
     }
-    .table-modern thead {
-        @apply text-xs font-semibold text-slate-500 uppercase tracking-wider;
+    .table-modern-th {
+        @apply px-6 py-4 bg-slate-50/80 text-xs font-semibold text-slate-500 uppercase tracking-wider;
     }
-    .table-modern thead th {
-        @apply px-6 py-4 bg-slate-50/80;
-    }
-    .table-modern tbody {
-        @apply divide-y divide-slate-100;
-    }
-    .table-modern tbody tr {
+    .table-modern-tr {
         @apply hover:bg-slate-50/50 transition-colors duration-150;
     }
-    .table-modern tbody td {
+    .table-modern-td {
         @apply px-6 py-4;
     }
 
@@ -89,12 +86,8 @@
 }
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes slideUp {
@@ -108,7 +101,7 @@
     }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar & selection (Left outside layers for global raw fallback) */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -116,13 +109,9 @@
     @apply bg-transparent;
 }
 ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full;
-}
-::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400;
+    @apply bg-slate-300 rounded-full hover:bg-slate-400;
 }
 
-/* Selection */
 ::selection {
     @apply bg-indigo-100 text-indigo-900;
 }
