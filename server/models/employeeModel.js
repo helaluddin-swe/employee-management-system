@@ -17,10 +17,10 @@ const EmployeeSchema = new mongoose.Schema(
       type: String, 
       required: true 
     },
-    employeeStatus: { 
+    employmentStatus: { 
       type: String, 
-      enum: ["Active", "Inactive","Terminated"], 
-      default: "Active" 
+      enum: ["ACTIVE", "INACTIVE"], 
+      default: "ACTIVE" 
     },
     joinDate: { 
       type: Date, 
@@ -55,6 +55,7 @@ const EmployeeSchema = new mongoose.Schema(
       enum: Department, 
       default: "Sales" 
     },
+    phone:{type:"String"}
   },
   { timestamps: true }
 );

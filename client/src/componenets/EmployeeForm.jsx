@@ -1,7 +1,9 @@
 import { useState } from "react"
+import {toast} from "react-toastify"
 import { useNavigate } from "react-router-dom"
 import { DEPARTMENTS } from "../assets/assets"
 import { Loader2Icon, User, Briefcase, ShieldAlert, X, Check } from "lucide-react"
+import api from "../api/api"
 
 const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
   const navigate = useNavigate()
@@ -11,13 +13,34 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
   const isEditMode = !!initialData
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    
-    // Form submission processing logic goes here...
-    // const formData = new FormData(e.target);
-    // const data = Object.fromEntries(formData.entries());
+  e.preventDefault();
+  setLoading(true);
+  
+  const formData = new FormData(e.currentTarget);
+  
+  // Convert FormData to a standard object
+  const data = Object.fromEntries(formData.entries());
+
+  // Handle optional password logic for edit mode safely
+  if (isEditMode && !data.password) {
+    delete data.password;
   }
+
+  try {
+    const url = isEditMode ? `/api/employees/${initialData.id}` : "/api/employees";
+    const method = isEditMode ? "put" : "post";
+    
+    // Pass the standard object payload instead of raw FormData
+    await api[method](url, data);
+    
+    onSuccess ? onSuccess() : navigate("/employees");
+  } catch (error) {
+    console.error(error);
+    toast.error(error.response?.data?.error || error.message);
+  } finally {
+    setLoading(false); // Make sure loading states flip back off safely
+  }
+};
 
   // Common Tailwind Input Styles for clean code reuse
   const inputStyles = "w-full mt-1.5 px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm shadow-sm"

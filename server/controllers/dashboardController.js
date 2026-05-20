@@ -7,9 +7,15 @@ import Payslip from "../models/paySlipModel.js";
 
 export const getDashboard = async (req, res) => {
   try {
-    const session = req.session;
+    
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthorized user context" });
+    }
+    
+    const { role, userId } = req.user; 
 
-    if (session.role === "ADMIN") {
+    // --- ADMIN DASHBOARD FLOW ---
+    if (role === "ADMIN") {
       const [totalEmployees, todayAttendance, pendingLeaves] = await Promise.all([
         Employee.countDocuments({ isDeleted: { $ne: true } }),
         Attendance.countDocuments({
@@ -23,18 +29,19 @@ export const getDashboard = async (req, res) => {
 
       return res.json({
         role: "ADMIN",
-        totalEmployees, // Fixed: Added missing field for frontend
-        todayAttendance, // Fixed: Removed duplicate
+        totalEmployees, 
+        todayAttendance, 
         totalDepartment: Department.length,
         pendingLeaves,
       });
+      
     } else {
-      // Fixed spelling to "employee" consistently
-      const employee = await Employee.findOne({
-        userId: session.userId,
-      }).lean();
+     
+      const employee = await Employee.findOne({ userId }).lean();
 
-      if (!employee) return res.status(404).json({ error: "Employee not found" });
+      if (!employee) {
+        return res.status(404).json({ error: "Employee profile not found" });
+      }
 
       const today = new Date();
       const [currentMonthAttendance, pendingLeaves, latestPayslip] = await Promise.all([
@@ -49,7 +56,6 @@ export const getDashboard = async (req, res) => {
           employeeId: employee._id,
           status: "PENDING",
         }),
-        // Fixed: Changed countDocuments to findOne to get the actual record object
         Payslip.findOne({ employeeId: employee._id })
           .sort({ createdAt: -1 })
           .lean(),
@@ -60,14 +66,13 @@ export const getDashboard = async (req, res) => {
         employee: { ...employee, id: employee._id.toString() },
         currentMonthAttendance,
         pendingLeaves,
-        // Fixed key name to singular "latestPayslip" to match frontend
         latestPayslip: latestPayslip
           ? { ...latestPayslip, id: latestPayslip._id.toString() }
           : null,
       });
     }
   } catch (error) {
-    console.error(error); // Helpful for debugging
+    console.error("Dashboard Error:", error); 
     return res.status(500).json({ error: "Failed to load dashboard data" });
   }
 };

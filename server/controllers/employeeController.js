@@ -1,46 +1,19 @@
-// get Employee
-import bcrypt from "bcrypt"
 import Employee from "../models/employeeModel.js";
-
+import bcrypt from "bcrypt";
 import User from "../models/userModel.js";
 
-// GET /api/getEmployee
-// export const getEmployee = async (req, res) => {
-//   try {
-//     const { department } = req.query;
-//     const filter = {};
-//     if (department) filter.department = department;
-//     const employees = (await Employee.find(filter))
-//       .toSorted({ createdAt: -1 })
-//       .populate("userId", "email role")
-//       .lean();
-//     const result = await employees.map((emp) => ({
-//       ...emp,
-//       id: emp._id.toString(),
-//       userId: emp.userId
-//         ? { email: emp.userId.email, role: emp.userId.role }
-//         : null,
-//     }));
-//     res.status(200).json(result);
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
+// Get Employees (GET /api/employees)
 export const getEmployee = async (req, res) => {
   try {
     const { department } = req.query;
     const filter = {};
     if (department) filter.department = department;
 
-    // FIX: Use Mongoose .sort() and chain queries properly before awaiting
     const employees = await Employee.find(filter)
       .sort({ createdAt: -1 })
       .populate("userId", "email role")
       .lean();
 
-    // FIX: Removed redundant 'await' from the synchronous .map()
     const result = employees.map((emp) => ({
       ...emp,
       id: emp._id.toString(),
@@ -51,12 +24,12 @@ export const getEmployee = async (req, res) => {
 
     res.status(200).json(result);
   } catch (error) {
-    console.error(error); // Changed to console.error for better logging visibility
+    console.error(error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
-// Create Employee
-// POST /api/createEmployee
+
+// Create Employee (POST /api/employees)
 export const createEmployee = async (req, res) => {
   try {
     const {
@@ -64,22 +37,19 @@ export const createEmployee = async (req, res) => {
       password,
       firstName,
       lastName,
-      employeeStatus,
+      employmentStatus,
       joinDate,
-      isDeleted,
       position,
       allowances,
       basicSalary,
       deductions,
       bio,
+      phone,
       department,
     } = req.body;
 
-    // Grab the role from the decoded token session
-    const role = req.session?.role; 
-
     if (!email || !password || !firstName || !lastName) {
-      return res.status(400).json({ error: "Missing Required field" });
+      return res.status(400).json({ error: "Missing required profile fields" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -94,14 +64,14 @@ export const createEmployee = async (req, res) => {
       userId: user._id,
       firstName,
       lastName,
-      employeeStatus,
+      employmentStatus: employmentStatus || "ACTIVE",
       joinDate: joinDate ? new Date(joinDate) : new Date(),
-      isDeleted,
       position,
       allowances: Number(allowances) || 0,
       basicSalary: Number(basicSalary) || 0, 
       deductions: Number(deductions) || 0,
       bio: bio || "",
+      phone,
       department: department || "Sales", 
     });
 
@@ -110,79 +80,88 @@ export const createEmployee = async (req, res) => {
     if (error.code === 11000) {
       return res.status(400).json({ success: false, error: "Email already exists" });
     }
-    res.status(500).json({ error: "Failed to create Employee" });
+    console.error(error);
+    res.status(500).json({ error: "Failed to create Employee profile" });
   }
 };
-//  update Employee
-// PUT /api/updateEmployee
+
+// Update Employee (PUT /api/employees/:id)
 export const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
     const {
+      email,           
+      role,             // FIXED: Added role to destructuring
+      password,         
       firstName,
       lastName,
-
-      employeeStatus,
-      isDeleted,
+      employmentStatus,
       position,
       allowances,
       basicSalary,
       deductions,
+      phone,
       bio,
       department,
     } = req.body;
 
     const employee = await Employee.findById(id);
-    if (!employee)
-      return res.status(404).json({ error: "Employee Id not Found" });
+    if (!employee) {
+      return res.status(404).json({ error: "Employee profile record not found" });
+    }
+
     await Employee.findByIdAndUpdate(id, {
       firstName,
       lastName,
-      email,
-      role,
-      employeeStatus,
-
-      isDeleted,
+      employmentStatus: employmentStatus || "ACTIVE",
       position,
       allowances: Number(allowances) || 0,
-      basiccSalary: Number(basicSalary) || 0,
+      basicSalary: Number(basicSalary) || 0, 
       deductions: Number(deductions) || 0,
       bio: bio || "",
-      employeeStatus: employeeStatus || "Active",
+      phone,
       department: department || "Sales",
     });
-    const updateUser = { email };
+
+    const updateUser = {};
+    if (email) updateUser.email = email;
     if (role) updateUser.role = role;
     if (password) updateUser.password = await bcrypt.hash(password, 10);
-    await User.findByIdAndUpdate(employee.userId, updateUser);
+    
+    if (Object.keys(updateUser).length > 0) {
+      await User.findByIdAndUpdate(employee.userId, updateUser);
+    }
+
     res.json({ success: true });
   } catch (error) {
     if (error.code === 11000) {
-      return res
-        .status(400)
-        .json({ success: false, error: "Email already exists" });
+      return res.status(400).json({ success: false, error: "Email already exists" });
     }
-    res.status(500).json({ error: "Failed to Updates Employee" });
+    console.error(error);
+    res.status(500).json({ error: "Failed to update Employee records" });
   }
 };
-// delete Employee
-// delete /api/deleteEmployee
+
+// Delete Employee (DELETE /api/employees/:id)
 export const deleteEmployee = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params; 
+    
     const employee = await Employee.findById(id);
-    if (!employee)
-      return res.status(404).json({ error: "Employee Id not Found" });
+    if (!employee) {
+      return res.status(404).json({ error: "Employee record not found" });
+    }
+
     employee.isDeleted = true;
-    employee.employeeStatus = "Inactive";
+    employee.employmentStatus = "INACTIVE";
     await employee.save();
+
     return res.json({
       success: true,
-      message: "Deleted Employee Successfully",
+      message: "Deactivated employee records successfully",
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Failed to Emplyeee deleted" });
+    console.error(error);
+    res.status(500).json({ success: false, message: "Failed to safely delete employee" });
   }
 };

@@ -5,6 +5,6 @@ import { userRateLimiter } from "../middleware/rateLimiter.js"
 const employeeRouter=express.Router()
 employeeRouter.get('/',protect,protectAdmin, getEmployee)
 employeeRouter.post('/',protect,protectAdmin,createEmployee)
-employeeRouter.post('/:id',protect,protectAdmin,updateEmployee)
+employeeRouter.put('/:id',protect,protectAdmin,updateEmployee)
 employeeRouter.delete('/:id',protect,protectAdmin,deleteEmployee)
 export default employeeRouter 

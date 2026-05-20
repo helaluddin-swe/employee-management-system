@@ -10,12 +10,12 @@ const Dashboard = () => {
   // Fixed: Initialized as null since dashboard data arrives as an Object
   const [data, setData] = useState(null);
 
-  useEffect(() => {
-    api.get('/api/dashboard')
-      .then((res) => setData(res.data))
-      .catch((err) => toast.error(err?.message || err.response?.data?.error))
-      .finally(() => setLoading(false));
-  }, []);
+  // useEffect(() => {
+  //   api.get('/api/dashboard')
+  //     .then((res) => setData(res.data))
+  //     .catch((err) => toast.error(err?.message || err.response?.data?.error))
+  //     .finally(() => setLoading(false));
+  // }, []);
 
   if (loading) return <Loading />;
   

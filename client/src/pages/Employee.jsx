@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
-import { DEPARTMENTS, dummyEmployeeData } from "../assets/assets"
+import { DEPARTMENTS } from "../assets/assets"
 import { Plus, Search, X } from "lucide-react"
 import EmployeeCard from "../componenets/EmployeeCard"
 import EmployeeForm from "../componenets/EmployeeForm"
+import api from "../api/api"
 
 const Employee = () => {
   const [employees, setEmployees] = useState([])
@@ -13,32 +14,37 @@ const Employee = () => {
   const [editEmployee, setEditEmployee] = useState(null)
   const [showCreateModel, setShowCreateModel] = useState(false)
 
-  const fetchEmployees = () => {
-    setLoading(true)
-    // Simulating API loading feel nicely
-    setTimeout(() => {
-      setEmployees(
-        dummyEmployeeData.filter((emp) =>
-          selectedDept ? emp.department === selectedDept : emp
-        )
-      )
-      setLoading(false)
-    }, 600)
-  }
-
-  // Fetch data on component mount or when department filters update
-  useEffect(() => {
+   const fetchEmployees = async () => {
+      try {
+        const url = selectedDept ? `/api/employees?department=${selectedDept}` : "/api/employees"
+        const res = await api.get(url)
+        setEmployees(res.data)
+      } catch (error) {
+        console.error("Not fetching employee data", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+ useEffect(() => {
     fetchEmployees()
   }, [selectedDept])
 
-  const filtered = employees.filter((emp) =>
-    `${emp.firstName} ${emp.lastName} ${emp.position}`
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  )
+ const filtered = employees.filter((emp) =>
+  `${emp.firstName || ''} ${emp.lastName || ''} ${emp.position || ''}`
+    .toLowerCase()
+    .includes(search.toLowerCase())
+)
 
-  const handleDelete = (id) => {
-    // Implement delete logic here if needed
+ const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to remove this employee record?")) return;
+    
+    try {
+      await api.delete(`/api/employees/${id}`)
+      
+      setEmployees((prev) => prev.filter((emp) => emp._id !== id))
+    } catch (error) {
+      console.error("Failed to delete employee profile record:", error)
+    }
   }
 
   const handleEdit = (employee) => {
@@ -51,7 +57,7 @@ const Employee = () => {
       {/* 1. DASHBOARD HEADER */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Team Directory</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Employee</h1>
           <p className="text-sm text-slate-500 mt-1">Manage corporate accounts, roles, and employee records.</p>
         </div>
         <button 

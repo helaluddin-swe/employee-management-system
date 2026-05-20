@@ -22,7 +22,7 @@ app.use(cors({
 
 connectDB()
 
-app.use('/api/employee',employeeRouter)
+app.use('/api/employees',employeeRouter)
 app.use('/api/attendance',attendanceRouter)
 app.use('/api/leave',leaveRouter)
 app.use('/api/payslips',payslipRouter)
