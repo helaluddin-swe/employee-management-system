@@ -2,28 +2,31 @@ import { useEffect, useState } from "react"
 import { DEPARTMENTS, dummyEmployeeData } from "../assets/assets"
 import { Plus, Search, X } from "lucide-react"
 import EmployeeCard from "../componenets/EmployeeCard"
+import EmployeeForm from "../componenets/EmployeeForm"
 
 const Employee = () => {
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [selectedDept, setSelectedDept] = useState("")
-  const [editEmployee,setEidtEmployee]=useState(null)
-  const [showcreateModel,setShowCreateModel]=useState(false)
+  // FIXED: Standardized spelling of state setter
+  const [editEmployee, setEditEmployee] = useState(null)
+  const [showCreateModel, setShowCreateModel] = useState(false)
 
   const fetchEmployees = () => {
     setLoading(true)
-    setEmployees(
-      dummyEmployeeData.filter((emp) =>
-        selectedDept ? emp.department === selectedDept : emp
-      )
-    )
+    // Simulating API loading feel nicely
     setTimeout(() => {
+      setEmployees(
+        dummyEmployeeData.filter((emp) =>
+          selectedDept ? emp.department === selectedDept : emp
+        )
+      )
       setLoading(false)
-    }, 1000)
+    }, 600)
   }
 
-  // Trigger fetchEmployees whenever selectedDept changes
+  // Fetch data on component mount or when department filters update
   useEffect(() => {
     fetchEmployees()
   }, [selectedDept])
@@ -33,34 +36,39 @@ const Employee = () => {
       .toLowerCase()
       .includes(search.toLowerCase())
   )
-  const handleDelete=()=>{
 
+  const handleDelete = (id) => {
+    // Implement delete logic here if needed
   }
-  const handleEdit=(e)=>{
-    setEidtEmployee(e)
+
+  const handleEdit = (employee) => {
+    setEditEmployee(employee)
   }
 
   return (
-    <div className="animate-fade-in p-4">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+    <div className="animate-fade-in p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto min-h-screen">
+      
+      {/* 1. DASHBOARD HEADER */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
         <div>
-          <h1 className="text-2xl font-bold">Employees</h1>
-          <p className="text-slate-500">Manage your team members</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Team Directory</h1>
+          <p className="text-sm text-slate-500 mt-1">Manage corporate accounts, roles, and employee records.</p>
         </div>
-        <button className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center bg-indigo-600 text-white px-4 py-2 rounded-lg" onClick={()=>setShowCreateModel(true)}>
-          <Plus size={16} /> Add Employee
+        <button 
+          className="flex items-center gap-2 w-full sm:w-auto justify-center bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm shadow-blue-500/10 transition-colors" 
+          onClick={() => setShowCreateModel(true)}
+        >
+          <Plus size={18} /> Add New Employee
         </button>
       </div>
 
-      {/* Search Bar */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      {/* 2. FILTERS & SEARCH ANCHOR */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-8">
         <div className="relative flex-1">
-          {/* FIXED: changed transform-translate-y-1/2 to -translate-y-1/2 */}
-          <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <input
-            placeholder="Search Employees"
-            className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-indigo-600"
+            placeholder="Search by name, position, role..."
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm text-slate-800"
             onChange={(e) => setSearch(e.target.value)}
             value={search}
           />
@@ -68,71 +76,89 @@ const Employee = () => {
         <select
           value={selectedDept}
           onChange={(e) => setSelectedDept(e.target.value)}
-          className="w-full sm:max-w-40 p-2 border rounded-lg bg-white"
+          className="w-full sm:max-w-xs px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-slate-700 shadow-sm transition-all cursor-pointer"
         >
           <option value="">All Departments</option>
           {DEPARTMENTS.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
+            <option key={d} value={d}>{d}</option>
           ))}
         </select>
       </div>
 
-      {/* Employee Cards */}
+      {/* 3. DIRECTORY GRID CONTENT AREA */}
       <div>
         {loading ? (
-          <div className="flex justify-center py-12">
-            {/* FIXED: changed border-3 to border-4 */}
-            <div className="animate-spin h-8 w-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
+          <div className="flex justify-center items-center py-24">
+            <div className="animate-spin h-9 w-9 border-4 border-blue-600 border-t-transparent rounded-full" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+          <>
             {filtered.length === 0 ? (
-             
-              <p className="col-span-full text-center py-16 text-slate-500 bg-slate-50 rounded-2xl border border-dashed">
-                No employee found
-              </p>
+              <div className="flex flex-col items-center justify-center text-center py-20 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 p-6">
+                <p className="text-sm font-medium text-slate-500">No personnel records found matching your query.</p>
+                <p className="text-xs text-slate-400 mt-1">Try resetting your filters or correcting your search keywords.</p>
+              </div>
             ) : (
-              filtered.map((emp) => (
-                <EmployeeCard key={emp._id} emp={emp} onDelete={handleDelete} onEdit={handleEdit}/>
-              ))
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                {filtered.map((emp) => (
+                  <EmployeeCard key={emp._id} emp={emp} onDelete={handleDelete} onEdit={handleEdit} />
+                ))}
+              </div>
             )}
-          </div>
+          </>
         )}
-{/* create employee model */}
-{showcreateModel && (
-  <div className="fixed bg-black/40 backdrop-blur-sm inset-0 z-50 flex items-center justify-center p-4 overflow-auto" onClick={()=>setShowCreateModel(false)}> 
- <div className="fixed inset-0"/>
-  <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-8 animate-fade-in" onClick={(e)=>e.stopPropagation()}>
-    <div className="flex items-center justify-between p-6 pb-0">
-      <div> 
-        <h2 className="text-lg font-semibold to-slate-900">Add New Employee</h2>
-        <p className="text-sm text-slate-500 mt-0.5">Create a user account and Employee</p>
-        
-         </div>
-      <button onClick={()=>setShowCreateModel(false)} className="p-2 rounded-lg hover:bg-slate-100 transition-colors to-slate-400 hover:to-slate-600">
-  <X className="w-5 h-5"/>
-      </button>
-
-    </div>
-    <div className="p-5">
-      <form>
-        form
-      </form>
-
-    </div>
-
-  </div>
-  
-  </div>
-)}
-
-
-{/* edit employee modal */}
-
-
       </div>
+
+      {/* 4. MODAL INSTANCES (REFACTORED CLEAN ROUTE) */}
+      
+      {/* A. Create Employee Modal */}
+      {showCreateModel && (
+        <div className="fixed bg-slate-900/40 backdrop-blur-sm inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowCreateModel(false)}>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-auto animate-scale-up max-h-[calc(100vh-4rem)] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">Register Employee Account</h2>
+                <p className="text-xs text-slate-500 mt-0.5">Provision system profiles and complete operational files.</p>
+              </div>
+              <button onClick={() => setShowCreateModel(false)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <EmployeeForm 
+                onSuccess={() => { setShowCreateModel(false); fetchEmployees(); }} 
+                onCancel={() => setShowCreateModel(false)} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* B. Edit Employee Modal */}
+      {/* FIXED: Complete structural rewrite to eliminate duplicate JSX tags and clean up layout */}
+      {editEmployee && (
+        <div className="fixed bg-slate-900/40 backdrop-blur-sm inset-0 z-50 flex items-center justify-center p-4" onClick={() => setEditEmployee(null)}>
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl my-auto animate-scale-up max-h-[calc(100vh-4rem)] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+              <div>
+                <h2 className="text-lg font-bold text-slate-900">Modify Employee Details</h2>
+                <p className="text-xs text-slate-500 mt-0.5">Update configuration files and database schema data fields.</p>
+              </div>
+              <button onClick={() => setEditEmployee(null)} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto">
+              <EmployeeForm 
+                initialData={editEmployee} 
+                onSuccess={() => { setEditEmployee(null); fetchEmployees(); }} 
+                onCancel={() => setEditEmployee(null)} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
