@@ -27,7 +27,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
   }
 
   try {
-    const url = isEditMode ? `/api/employees/${initialData.id}` : "/api/employees";
+    const url = isEditMode ? `/api/employees/${initialData._id}` : "/api/employees";
     const method = isEditMode ? "put" : "post";
     
     // Pass the standard object payload instead of raw FormData
@@ -119,7 +119,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
           {isEditMode && (
             <div>
               <label className={labelStyles}>Status</label>
-              {/* FIXED: Removed unneeded min/step values, fixed spelling of employmentStatus */}
+              
               <select name="employmentStatus" defaultValue={initialData?.employmentStatus || "ACTIVE"} className={inputStyles}>
                 <option value="ACTIVE">Active</option>
                 <option value="INACTIVE">Inactive</option>
@@ -139,7 +139,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div className="sm:col-span-2">
             <label className={labelStyles}>Work Email</label>
-            <input type="email" name="email" required defaultValue={initialData?.email} className={inputStyles} placeholder="username@company.com" />
+            <input type="email" name="email" required defaultValue={initialData?.email || initialData?.user?.email || initialData?.userId?.email || ""} className={inputStyles} placeholder="username@company.com" autoComplete="none" />
           </div>
 
           <div className="sm:col-span-2">
@@ -149,6 +149,7 @@ const EmployeeForm = ({ initialData, onSuccess, onCancel }) => {
             <input 
               type="password" 
               name="password" 
+              autoComplete="new-password"
               required={!isEditMode} 
               className={inputStyles} 
               placeholder="••••••••••••"

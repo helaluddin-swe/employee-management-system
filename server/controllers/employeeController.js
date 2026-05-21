@@ -91,7 +91,7 @@ export const updateEmployee = async (req, res) => {
     const { id } = req.params;
     const {
       email,           
-      role,             // FIXED: Added role to destructuring
+      role,            
       password,         
       firstName,
       lastName,
@@ -123,13 +123,15 @@ export const updateEmployee = async (req, res) => {
       department: department || "Sales",
     });
 
+    
+
     const updateUser = {};
     if (email) updateUser.email = email;
     if (role) updateUser.role = role;
     if (password) updateUser.password = await bcrypt.hash(password, 10);
     
     if (Object.keys(updateUser).length > 0) {
-      await User.findByIdAndUpdate(employee.userId, updateUser);
+      await User.findByIdAndUpdate(employee.userId,updateUser);
     }
 
     res.json({ success: true });
